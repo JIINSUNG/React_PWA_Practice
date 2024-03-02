@@ -1,11 +1,31 @@
 import "./App.css";
+import { useEffect } from "react";
 import { Navbar, Container, Nav } from "react-bootstrap";
 import Home from "./Home";
 import About from "./About";
 import Users from "./Users";
 import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-
+import { messaging } from "./firebase";
+import { getToken } from "firebase/messaging";
 function App() {
+  async function requestPermission() {
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      console.log("granted!");
+      const token = await getToken(messaging, {
+        vapidKey:
+          "BHjD-QwXA6zqIuzljdGDa909FgrEfEvQOtlWm2uiGnRh_BuURXzNSBlFCrapbOkf8UUMRzuqd3CMA0AlDk888yQ",
+      }).then((currentToken) => {
+        console.log("Token Gen", currentToken);
+      });
+    } else if (permission === "denied") {
+      alert("Notification permission denied");
+    }
+  }
+  useEffect(() => {
+    requestPermission();
+  }, []);
+
   return (
     <div className="App">
       <Router>
